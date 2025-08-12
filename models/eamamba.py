@@ -289,7 +289,7 @@ class EAMamba(nn.Module):
         dual_pixel_task=False,       # True for dual-pixel defocus deblurring only. Also set inp_channels=6
         checkpoint_percentage=0.0,   # percentage of checkpointed block
         channel_mixer_type='Simple',
-        upscale=2,  
+        upscale=1,  
         mamba_cfg=None,
         **kwargs        # This is to ignore any other arguments that are not used
     ):
