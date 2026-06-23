@@ -1,4 +1,4 @@
-# EAMamba: Efficient All-Around Vision State Space Model for Image Restoration
+# [EAMamba: Efficient All-Around Vision State Space Model for Image Restoration](https://daidaijr.github.io/EAMamba/)
 
 [Yu-Cheng Lin](https://github.com/daidaijr), [Yu-Syuan Xu](https://github.com/XUSean0118), Hao-Wei Chen, Hsien-Kai Kuo, Chun-Yi Lee
 
