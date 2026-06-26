@@ -21,6 +21,7 @@
 - [Installation](#-installation)
 - [Training](#-training)
 - [Testing](#-testing-general)
+- [Our Extensions](#-our-extensions)
 - [Profiling](#️-profiling)
 - [Task-Specific Evaluation](#-task-specific-evaluation)
 - [Results](#-results)
@@ -110,6 +111,51 @@ python3 test.py --model [MODEL_FILE] --dataset [DATASET] (--ensemble) (--save)
 
 The ensemble mode is used to average the output of multiple 
 rotated images to improve the performance, we did not use it in our experiments. 
+
+<br>
+<hr />
+
+## 🔬 Our Extensions
+
+> All experiments below were conducted on the **GoPro motion deblurring test set** (1111 images) using the pretrained EAMamba checkpoint at 450,000 iterations, evaluated on a SLURM GPU cluster (param-shivay, NVIDIA GPU).
+
+### 📌 Inference-Only Mode
+
+We extended `test.py` to support running the model on a folder of images without requiring ground-truth pairs — useful for testing on custom or real-world blurry images.
+
+```bash
+python3 test.py --model [MODEL_FILE] --input-dir [INPUT_DIR] --output-dir [OUTPUT_DIR]
+```
+
+| Parameter | Description |
+|---|---|
+| **`MODEL_FILE`** | Path to the model checkpoint. |
+| **`INPUT_DIR`** | Folder of input images (`.png`, `.jpg`, `.jpeg`). |
+| **`OUTPUT_DIR`** | Folder to save restored images. |
+
+<br>
+
+### 📌 Post-Processing Evaluation
+
+We evaluated several image-space post-processing methods applied to model outputs, implemented in `test_postprocess.py`. All methods were tested on the GoPro test set.
+
+```bash
+python3 test_postprocess.py --model [MODEL_FILE] --dataset GoPro --postprocess [METHOD]
+```
+
+Available methods: `unsharp`, `guided`, `bilateral`, `frequency`, `clahe`, `combined`
+
+**Results on GoPro (PSNR / SSIM):**
+
+| Method | PSNR | SSIM | vs. Baseline |
+|---|---|---|---|
+| Baseline | 33.59 | 0.9467 | — |
+| Self-Ensemble (TTA) | **33.81** | **0.9485** | +0.23 dB |
+| Bilateral Filter | 33.31 | 0.9400 | −0.28 dB |
+| Unsharp Masking | 31.86 | 0.9384 | −1.73 dB |
+| Guided Filter | 29.62 | 0.8763 | −3.97 dB |
+
+**Key finding:** Image-space post-processing consistently degraded PSNR on this task. Only **self-ensemble (TTA)** — averaging predictions over horizontal and vertical flips — yielded an improvement (+0.23 dB), at the cost of ~3× inference time.
 
 <br>
 <hr />
@@ -325,18 +371,23 @@ Here are the quantitative results for each dataset. Click on the dropdown to see
   <table>
     <thead>
       <tr>
-        <th>Dataset</th><th>PSNR</th><th>SSIM</th>
+        <th>Dataset</th><th>Method</th><th>PSNR</th><th>SSIM</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>GoPro</td><td>33.58</td><td>0.966</td>
+        <td>GoPro</td><td>Baseline</td><td>33.59</td><td>0.9467</td>
       </tr>
       <tr>
-        <td>HIDE</td><td>31.42</td><td>0.944</td>
+        <td>GoPro</td><td>+ Self-Ensemble (TTA)</td><td><strong>33.81</strong></td><td><strong>0.9485</strong></td>
+      </tr>
+      <tr>
+        <td>HIDE</td><td>Baseline</td><td>31.42</td><td>0.944</td>
       </tr>
     </tbody>
   </table>
+
+  **Self-Ensemble (Test-Time Augmentation):** We evaluated test-time augmentation on the GoPro test set (1111 images) by averaging predictions over the original image and its horizontal/vertical flips. This yielded a **+0.23 dB PSNR improvement** (33.59 → 33.81) with a marginal SSIM gain (+0.002), at the cost of ~3× inference time. Image-space post-processing methods (unsharp masking, guided filter, bilateral filter) were also evaluated but all degraded PSNR and are not recommended.
 </details>
 
 <details>

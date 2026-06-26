@@ -1,0 +1,84 @@
+==========================================
+SLURM_CLUSTER_NAME = param-shivay
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = mechanical_engg
+SLURM_JOB_ID = 1208062
+SLURM_JOB_NAME = gopro_complete
+SLURM_JOB_NODELIST = gpu004
+SLURM_JOB_USER = suyash.kumar.mec22.itbhu
+SLURM_JOB_UID = 6339
+SLURM_JOB_PARTITION = gpu
+SLURM_TASK_PID = 120237
+SLURM_SUBMIT_DIR = /home/suyash.kumar.mec22.itbhu/EAMamba
+SLURM_CPUS_ON_NODE = 1
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 120237
+==========================================
+==========================================
+COMPLETE EVALUATION - All Post-Processing Methods
+Dataset: GoPro Test Set (1111 images)
+Started at: Sun Apr 19 22:24:07 IST 2026
+==========================================
+
+----------------------------------------
+1. BASELINE EVALUATION
+----------------------------------------
+Running baseline evaluation...
+450000
+current dataset: test-GoPro
+result psnr : 33.5881 ssim : 0.9467
+
+Baseline completed at: Sun Apr 19 23:06:54 IST 2026
+
+----------------------------------------
+2. SELF-ENSEMBLE (Test-Time Augmentation)
+Expected: +0.15 to +0.30 dB improvement
+----------------------------------------
+450000
+current dataset: test-GoPro
+result psnr : 33.8137 ssim : 0.9485
+
+Self-ensemble completed at: Mon Apr 20 01:20:15 IST 2026
+
+----------------------------------------
+3. UNSHARP MASKING
+Expected: +0.03 to +0.08 dB improvement
+----------------------------------------
+Post-processing method: unsharp
+450000
+current dataset: test-GoPro
+result psnr : 31.8594 ssim : 0.9384
+
+Unsharp masking completed at: Mon Apr 20 02:04:11 IST 2026
+
+----------------------------------------
+4. GUIDED FILTER (Edge-Preserving)
+Expected: Better SSIM, artifact reduction
+----------------------------------------
+Post-processing method: guided
+450000
+current dataset: test-GoPro
+result psnr : 29.6205 ssim : 0.8763
+
+Guided filter completed at: Mon Apr 20 02:46:38 IST 2026
+
+----------------------------------------
+5. BILATERAL FILTER (Noise Reduction)
+Expected: Better SSIM, smoother results
+----------------------------------------
+Post-processing method: bilateral
+450000
+current dataset: test-GoPro
+result psnr : 33.3105 ssim : 0.9400
+
+Bilateral filter completed at: Mon Apr 20 03:26:54 IST 2026
+
+Complete summary saved to: /home/suyash.kumar.mec22.itbhu/gopro-results/COMPLETE_RESULTS_SUMMARY.txt
+
+==========================================
+EVALUATION COMPLETE!
+==========================================

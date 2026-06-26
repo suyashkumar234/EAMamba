@@ -232,6 +232,8 @@ if __name__ == '__main__':
     parser.add_argument('--dataset')
     parser.add_argument('--ensemble', action='store_true', default=False)
     parser.add_argument('--save', action='store_true', default=False)   # save images or not
+    parser.add_argument('--input-dir', help='Input directory for inference-only mode (no GT needed)')
+    parser.add_argument('--output-dir', help='Output directory for inference-only mode')
     args = parser.parse_args()
     
     sv_file = torch.load(args.model)
@@ -295,10 +297,46 @@ if __name__ == '__main__':
                  'configs/test/deblur/test-DPDD.yaml'],
     }
 
-    test_list = dataset_dict[args.dataset]
-    
     _, model_e = models.make(model_spec, load_sd=True)
     model_e = model_e.cuda()
+
+    # Inference-only mode (no GT images needed)
+    if args.input_dir:
+        print("Running inference-only mode (no GT images)")
+        print(f"Input directory: {args.input_dir}")
+
+        output_dir = pathlib.Path(args.output_dir if args.output_dir else './inference_results')
+        output_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Output directory: {output_dir}\n")
+
+        # Get all images (filter out Mac metadata files starting with ._ )
+        input_path = pathlib.Path(args.input_dir)
+        all_files = list(input_path.glob('*.png')) + list(input_path.glob('*.jpg')) + list(input_path.glob('*.jpeg'))
+        image_files = sorted([f for f in all_files if not f.name.startswith('._')])
+        print(f"Found {len(image_files)} images to process\n")
+
+        model_e.eval()
+        pbar = tqdm(image_files, desc='Processing')
+
+        for img_file in pbar:
+            # Load image
+            img = Image.open(img_file).convert('RGB')
+            img_tensor = transforms.ToTensor()(img).unsqueeze(0).cuda()
+
+            # Run inference
+            with torch.no_grad():
+                output = model_e(img_tensor)
+
+            # Save result
+            output = torch.clamp(output.squeeze(0), 0, 1)
+            output_img = transforms.ToPILImage()(output.cpu())
+            output_img.save(output_dir / img_file.name)
+
+        print(f"\nDone! Processed {len(image_files)} images")
+        print(f"Results saved to: {output_dir}")
+        exit()
+
+    test_list = dataset_dict[args.dataset]
 
     for config_name in test_list:
         with open(config_name, 'r') as f:

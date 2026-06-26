@@ -3,3 +3,16 @@ save/
 logs/
 
 .DS_Store
+
+# Result image folders
+test-GoPro-results/
+test-GoPro-results-*/
+
+# Experiment logs and reports
+*.err
+*.pptx
+*.pdf
+
+# macOS metadata files
+._*
+._.*/
